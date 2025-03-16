@@ -5,6 +5,8 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Moq;
+using Microsoft.Extensions.Logging;
 
 namespace StringManipulation.Tests
 {
@@ -216,7 +218,70 @@ namespace StringManipulation.Tests
             Assert.Equal(expected, result);
         }
 
+        [Fact]
+        public void CountOccurrences()
+        {
+            var mockLogger = new Mock<ILogger<StringOperations>>();
+            StringOperations ops = new StringOperations(mockLogger.Object);
 
+            var result = ops.CountOccurrences("hello platzi", 'l');
+
+            Assert.Equal(3, result);
+        }
+
+        [Theory]
+        [InlineData("hello", 'l', 2)]
+        [InlineData("hello", 'z', 0)]
+        [InlineData("", 'a', 0)]
+        public void CountOccurrences_ValidInput_ReturnsCorrectCount(string input, char character, int expectedCount)
+        {
+            // Arrange
+            // Crear un mock del logger para verificar que se llame al método LogInformation
+            //y simular la dependencia de ILogger
+            var mockLogger = new Mock<ILogger<StringOperations>>();
+            StringOperations ops = new StringOperations(mockLogger.Object);
+
+            // Act
+            int result = ops.CountOccurrences(input, character);
+
+            // Assert
+            Assert.Equal(expectedCount, result);
+            //mockLogger.Verify(logger => logger.LogInformation(It.Is<string>(s => s.Contains(expectedCount.ToString()))), Times.Once);
+        }
+
+        [Fact]
+        public void CountOccurrences_NullInput_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var mockLogger = new Mock<ILogger<StringOperations>>();
+            StringOperations ops = new StringOperations(mockLogger.Object);
+
+            // Act & Assert
+            Assert.Throws<NullReferenceException>(() => ops.CountOccurrences(null, 'a'));
+        }
+
+        //Prueba para el metodo de lectura de archivo
+        //utilizando moq para simular el archivo y que esta no dependa de un archivo en especifico
+        [Fact]
+        public void ReadFile()
+        {
+            // Arrange
+
+            // Crear un mock del lector de archivos para simular la lectura de un archivo
+            var mockFileReader = new Mock<IFileReaderConector>();
+            StringOperations ops = new StringOperations();
+
+            // Configurar el comportamiento del mock para que devuelva una cadena específica al leer un archivo
+            mockFileReader.Setup(p => p.ReadString(It.IsAny<string>())).Returns("Reading File");
+
+            // Act
+            var result = ops.ReadFile(mockFileReader.Object, "file_text.txt");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result);
+            Assert.Equal("Reading File", result);
+        }
 
 
     }
