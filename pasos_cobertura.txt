@@ -1,0 +1,25 @@
+Pasos para generar reportes de cobertura de pruebas
+
+
+1. Prerequisitos:
+   - Tener .NET SDK instalado
+   - Tener la herramienta ReportGenerator instalada
+
+2. Instalar ReportGenerator (si no esta instalado):
+   dotnet tool install -g dotnet-reportgenerator-globaltool
+
+3. Navegar a la carpeta del proyecto de pruebas:
+   cd ruta_del_proyecto_pruebas
+
+4. Ejecutar las pruebas y generar el reporte XML:
+   dotnet test --collect:"XPlat Code Coverage"
+
+5. Generar el reporte HTML:
+   dotnet reportgenerator -reports:"./TestResults/**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
+
+6. Ubicacion de los reportes generados:
+   - Reporte XML: Estara en la carpeta TestResults
+   - Reporte HTML: Estara en la carpeta coveragereport
+
+7. Para ver el reporte:
+   Abrir el archivo coveragereport/index.html en tu navegador web
